@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import styled from "styled-components";
-//import "react-color";
-//import { SketchPicker } from 'react-color';
+import "react-color";
+import { SketchPicker } from 'react-color';
 
 interface CanvasProps {
   w: number;
@@ -11,6 +11,7 @@ interface CanvasProps {
 export const Canvas = ({ w, h }: CanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
+  const [penColor,setPenColor] = useState("#000000")
 
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
@@ -31,6 +32,9 @@ export const Canvas = ({ w, h }: CanvasProps) => {
     if (!isDrawing) return;
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
+    if(ctx){
+      ctx.strokeStyle = penColor
+    }
     ctx?.lineTo(e.clientX, e.clientY);
     ctx?.stroke();
   };
@@ -50,6 +54,10 @@ export const Canvas = ({ w, h }: CanvasProps) => {
     link.click();
   };
 
+  const handleChangeComplete = (color:any)=>{
+    setPenColor(color)
+  }
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -68,6 +76,11 @@ export const Canvas = ({ w, h }: CanvasProps) => {
       <ToolBar>
         <button onClick={clear}>Clear</button>
         <button onClick={download}>Download</button>
+        {/*<button>color</button>*/}
+        <SketchPicker
+          color={penColor}
+          onChange={ (c)=>{setPenColor(c.hex);console.log(penColor) } }
+        />
         {/*<SketchPicker/>*/}
       </ToolBar>
     </Container>
