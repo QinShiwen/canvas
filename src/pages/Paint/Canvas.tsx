@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import styled from "styled-components";
-//import "react-color";
-//import { SketchPicker } from 'react-color';
+import { SketchPicker } from "react-color";
+import { Slider } from "antd";
 
 interface CanvasProps {
   w: number;
@@ -11,13 +11,21 @@ interface CanvasProps {
 export const Canvas = ({ w, h }: CanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
+  const [color, setColor] = useState("#000000");
+  const [colorPickerVisible, setColorPickerVisible] = useState(false);
+  const [canvasWidth, setCanvasWidth] = useState(w);
+  const [canvasHeight, setCanvasHeight] = useState(h);
+  const [penSize, setPenSize] = useState(5);
 
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
-    const ctx = canvas?.getContext("2d");
-    ctx?.beginPath();
-    ctx?.moveTo(e.clientX, e.clientY);
-    setIsDrawing(true);
+    if (canvas) {
+      const ctx = canvas?.getContext("2d");
+      ctx?.beginPath();
+      //console.log(canvas?.offsetTop, canvas?.offsetLeft);
+      ctx?.moveTo(e.pageX-canvas.offsetLeft, e.pageY-canvas.offsetTop);
+      setIsDrawing(true);
+    }
   };
 
   const finishDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -26,13 +34,22 @@ export const Canvas = ({ w, h }: CanvasProps) => {
     ctx?.closePath();
     setIsDrawing(false);
   };
+  const formatter = (value: number) => `${value}%`;
 
   const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!isDrawing) return;
     const canvas = canvasRef.current;
-    const ctx = canvas?.getContext("2d");
-    ctx?.lineTo(e.clientX, e.clientY);
-    ctx?.stroke();
+    if (canvas) {
+      const ctx = canvas?.getContext("2d");
+      if (ctx) {
+        ctx.lineCap = "round";
+        ctx.strokeStyle = color;
+        ctx.lineWidth = penSize;
+      }
+      ctx?.lineTo(e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop);
+      //console.log(e.pageX-canvas.offsetTop, e.pageY-canvas.offsetLeft)
+      ctx?.stroke();
+    }
   };
 
   const clear = () => {
@@ -50,6 +67,12 @@ export const Canvas = ({ w, h }: CanvasProps) => {
     link.click();
   };
 
+  const Resize = (multiple: number) => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext("2d");
+    ctx?.scale(2, 2);
+  };
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -57,27 +80,56 @@ export const Canvas = ({ w, h }: CanvasProps) => {
 
   return (
     <Container>
+      <ToolBar>
+        <button onClick={clear}>Clear</button>
+        <button onClick={download}>Download</button>
+        <button onClick={() => setColorPickerVisible(!colorPickerVisible)}>
+          <div style={{ backgroundColor: color, width: 25, height: 25 }}></div>
+        </button>
+        <div style={{ display: colorPickerVisible ? "block" : "none" }}>
+          <SketchPicker
+            color={color}
+            onChange={(newColor) => setColor(newColor.hex)}
+          />
+        </div>
+        <Slider max={10} min={0} defaultValue={5} onChange={(v)=>setPenSize(v)}/>
+      </ToolBar>
       <canvas
         ref={canvasRef}
-        width={w}
-        height={h}
+        width={canvasWidth}
+        height={canvasHeight}
         onMouseDown={(e) => startDrawing(e)}
         onMouseUp={(e) => finishDrawing(e)}
         onMouseMove={(e) => draw(e)}
       />
-      <ToolBar>
-        <button onClick={clear}>Clear</button>
-        <button onClick={download}>Download</button>
-        {/*<SketchPicker/>*/}
-      </ToolBar>
     </Container>
   );
 };
 
 const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   canvas {
     background-color: white;
   }
 `;
 
-const ToolBar = styled.div``;
+const ToolBar = styled.div`
+  z-index: 1;
+  button {
+    margin: 10px;
+    height: 30px;
+    cursor: pointer;
+  }
+  display: flex;
+  flex-direction: row;
+  .sketch-picker {
+    position: absolute;
+    z-index: 100;
+  }
+  .ant-slider {
+    width: 100px;
+  }
+`;
