@@ -8,5 +8,11 @@ A basic painting demo with the functions below:
 - Adjust the size of canvas
 
 # Install
-Input `npm install` in the terminal to install the dependencies
-Input `npm start` to run project
+- Input `npm install` in the terminal to install the dependencies
+- Input `npm start` to run project
+
+# Built with
+- React
+- TypeScript
+- react-color
+
