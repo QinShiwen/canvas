@@ -6,6 +6,16 @@ A basic painting demo with the functions below:
 - download canvas
 - change the size and color of the pen 
 - Adjust the size of canvas
+- Share link to others to draw together
+
+# Data Structure Design
+```
+{
+    userid:string;
+    roomid:string;
+    paintingData:array[];
+}
+```
 
 # Install
 - Input `npm install` in the terminal to install the dependencies
@@ -15,4 +25,5 @@ A basic painting demo with the functions below:
 - React
 - TypeScript
 - react-color
-
+- Antd
+- Websocket

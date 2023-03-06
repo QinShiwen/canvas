@@ -34,7 +34,6 @@ export const Canvas = ({ w, h }: CanvasProps) => {
     ctx?.closePath();
     setIsDrawing(false);
   };
-  const formatter = (value: number) => `${value}%`;
 
   const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!isDrawing) return;
@@ -92,7 +91,7 @@ export const Canvas = ({ w, h }: CanvasProps) => {
             onChange={(newColor) => setColor(newColor.hex)}
           />
         </div>
-        <Slider max={10} min={0} defaultValue={5} onChange={(v)=>setPenSize(v)}/>
+        <div className = "pen-slide-box">Pen Size<Slider max={10} min={0} defaultValue={5} onChange={(v)=>setPenSize(v)}/></div>
       </ToolBar>
       <canvas
         ref={canvasRef}
@@ -113,21 +112,39 @@ const Container = styled.div`
   align-items: center;
   canvas {
     background-color: white;
+    border-radius: 5px;
   }
 `;
 
 const ToolBar = styled.div`
   z-index: 1;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  
   button {
     margin: 10px;
     height: 30px;
     cursor: pointer;
+    background-color: white;
+    border-radius: 5px;
+    outline: none;
+    border: none;
   }
-  display: flex;
-  flex-direction: row;
   .sketch-picker {
     position: absolute;
     z-index: 100;
+  }
+  .pen-slide-box{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    height: 30px;
+    background-color: white;
+    padding: 0 10px;
+    border-radius: 5px;
   }
   .ant-slider {
     width: 100px;
