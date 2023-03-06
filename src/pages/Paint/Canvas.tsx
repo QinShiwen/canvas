@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from "react";
 import styled from "styled-components";
 import { SketchPicker } from "react-color";
 import { Slider } from "antd";
+import {io, Socket} from 'socket.io-client';
 
 interface CanvasProps {
   w: number;
@@ -9,13 +10,13 @@ interface CanvasProps {
 }
 
 export const Canvas = ({ w, h }: CanvasProps) => {
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [color, setColor] = useState("#000000");
   const [colorPickerVisible, setColorPickerVisible] = useState(false);
-  const [canvasWidth, setCanvasWidth] = useState(w);
-  const [canvasHeight, setCanvasHeight] = useState(h);
   const [penSize, setPenSize] = useState(5);
+  const socketRef = useRef<Socket>();
 
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
@@ -23,7 +24,7 @@ export const Canvas = ({ w, h }: CanvasProps) => {
       const ctx = canvas?.getContext("2d");
       ctx?.beginPath();
       //console.log(canvas?.offsetTop, canvas?.offsetLeft);
-      ctx?.moveTo(e.pageX-canvas.offsetLeft, e.pageY-canvas.offsetTop);
+      ctx?.moveTo(e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop);
       setIsDrawing(true);
     }
   };
@@ -68,13 +69,27 @@ export const Canvas = ({ w, h }: CanvasProps) => {
 
   const Resize = (multiple: number) => {
     const canvas = canvasRef.current;
-    const ctx = canvas?.getContext("2d");
-    ctx?.scale(2, 2);
+    if (canvas) {
+      const ctx = canvas?.getContext("2d");
+      if (ctx) {
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        canvas.width = canvas.width * multiple;
+        canvas.height = canvas.height * multiple;
+        ctx.putImageData(imageData, 0, 0);
+      }
+    }
   };
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    socketRef.current = io("http://localhost:8080");
+    //connect the websocket
+    socketRef.current.on("connect",()=>{
+      console.log("connected");
+    })
+    socketRef.current.on("drawing",(data)=>{
+      //console.log(data);
+      
+    })
   }, []);
 
   return (
@@ -91,12 +106,26 @@ export const Canvas = ({ w, h }: CanvasProps) => {
             onChange={(newColor) => setColor(newColor.hex)}
           />
         </div>
-        <div className = "pen-slide-box">Pen Size<Slider max={10} min={0} defaultValue={5} onChange={(v)=>setPenSize(v)}/></div>
+        <div className="pen-slide-box" style = {{padding:0}}>
+          <button onClick={() => Resize(0.8)}>-</button>
+            canvas size
+          <button onClick={() => Resize(1.2)}>+</button>
+        </div>
+        <div className="pen-slide-box">
+          Pen Size
+          <Slider
+            max={10}
+            min={0}
+            defaultValue={5}
+            onChange={(v) => setPenSize(v)}
+          />
+        </div>
+        <button>Share</button>
       </ToolBar>
       <canvas
         ref={canvasRef}
-        width={canvasWidth}
-        height={canvasHeight}
+        width={w}
+        height={h}
         onMouseDown={(e) => startDrawing(e)}
         onMouseUp={(e) => finishDrawing(e)}
         onMouseMove={(e) => draw(e)}
@@ -122,7 +151,7 @@ const ToolBar = styled.div`
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  
+
   button {
     margin: 10px;
     height: 30px;
@@ -136,7 +165,7 @@ const ToolBar = styled.div`
     position: absolute;
     z-index: 100;
   }
-  .pen-slide-box{
+  .pen-slide-box {
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -145,6 +174,13 @@ const ToolBar = styled.div`
     background-color: white;
     padding: 0 10px;
     border-radius: 5px;
+    margin: 10px;
+    button{
+      background-color: purple;
+      color: white;
+      height: 20px;
+      width: 20px;
+    }
   }
   .ant-slider {
     width: 100px;
