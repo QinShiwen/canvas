@@ -1,14 +1,18 @@
-import React,{useRef,useEffect,useState} from 'react';
+import {useEffect,useState} from 'react';
 import styled from 'styled-components';
 import './App.css';
 import { Canvas } from './pages/Paint/Canvas';
+import { Login } from './pages/Login/Login';
+
 function App() {
+  const [isLogin, setIsLogin] = useState(false);
   useEffect(() => {
-    console.log(document.body.clientWidth, document.body.clientHeight)
+    //console.log(document.body.clientWidth, document.body.clientHeight)
+    console.log(isLogin)
   })
   return (
     <Container>
-      <Canvas w = {800} h = {500}/>
+      {isLogin ? <Canvas w = {800} h = {500}/> : <Login setIsLogin = {setIsLogin}/> }
     </Container>
   );
 }
