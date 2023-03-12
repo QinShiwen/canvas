@@ -27,7 +27,7 @@ A basic painting demo with the functions below:
         username:string;
     }]
     paintingInfo:[
-        
+
     ]
 }
 ```
@@ -50,8 +50,12 @@ A basic painting demo with the functions below:
 - Input `npm start` to run project
 
 # Built with
+## Frontend
 - React
 - TypeScript
 - react-color
 - Antd
 - Websocket
+## Backend
+- NodeJS
+- MySQL

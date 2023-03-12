@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import styled from "styled-components";
 
@@ -12,7 +12,12 @@ interface RegisterForm {
   email: string;
   password: string;
 }
-export const Login = (setIsLogin: any) => {
+
+interface LoginProps {
+  setIsLogin:(value: boolean) => void
+}
+
+export const Login = ({setIsLogin}:LoginProps) => {
   const [isLoginForm, setIsLoginForm] = useState(true);
 
   const [loginForm, setLoginForm] = useState<LoginForm>({
@@ -37,11 +42,46 @@ export const Login = (setIsLogin: any) => {
     });
   };
 
-  const login = () => {
-    //setIsLogin(true);
+  const login =  async () => {
+    if(loginForm.email === "" || loginForm.password === ""){
+      alert("Please fill in the form")
+      return;
+    }
+    //check if the email is valid
+    if(!loginForm.email.includes("@")){
+      alert("Please enter a valid email")
+      return;
+    }
+    //check if the password is valid
+    if(loginForm.password.length < 6){
+      alert("Password's length should be at least 6")
+      return;
+    }
+
+      
+    setIsLogin(true);
   };
 
   const register = async () => {
+    if(RegisterForm.email === "" || RegisterForm.password === ""){
+      alert("Please fill in the form")
+      return;
+    }
+    //check if the email is valid
+    if(!RegisterForm.email.includes("@")){
+      alert("Please enter a valid email")
+      return;
+    }
+    //check if the password is valid
+    if(RegisterForm.password.length < 6){
+      alert("Password's length should be at least 6")
+      return;
+    }
+    //check if the email is already registered
+
+
+
+
     setIsLoginForm(true);
   };
 
@@ -53,6 +93,7 @@ export const Login = (setIsLogin: any) => {
           <input placeholder="email" name="email" onChange={loginChange} />
           <input
             placeholder="password"
+            type = "password"
             name="password"
             onChange={loginChange}
           ></input>
@@ -66,10 +107,12 @@ export const Login = (setIsLogin: any) => {
           <input placeholder="name" name="username" onChange={registerChange} />
           <input
             placeholder="password"
+            type = "password"
             name="password"
             onChange={registerChange}
           ></input>
           <button onClick={register}>Register</button>
+          <div style={{cursor:"pointer"}} onClick = {()=>setIsLoginForm(true)}>Log In</div>
         </FormBox>
       )}
     </Container>
@@ -85,7 +128,7 @@ const Container = styled.div`
   justify-content: center;
 `;
 
-const FormBox = styled.form`
+const FormBox = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
