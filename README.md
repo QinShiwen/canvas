@@ -16,6 +16,7 @@ A basic painting demo with the functions below:
     username:string;
     email:string;
     password:string;
+    roomid:string;
 }
 ```
 - data when painting with other users
@@ -26,7 +27,7 @@ A basic painting demo with the functions below:
         userid:string;
         username:string;
     }]
-    paintingInfo:[
+    paintingInfo:[   //points in the canvas
 
     ]
 }
@@ -34,8 +35,8 @@ A basic painting demo with the functions below:
 
 # Project Logic
 ## Login
-- Auth user
-- Entering the room with roomid(?) especially for the user
+- Auth user (register and log in)
+- Entering a room with roomid(?) especially for the user
 ## Draw
 - paint
 - claer canvas
@@ -43,7 +44,6 @@ A basic painting demo with the functions below:
 - change the size and color of the pen 
 - Adjust the size of canvas
 - Share link to others to draw together 
-
 
 # Install
 - Input `npm install` in the terminal to install the dependencies
