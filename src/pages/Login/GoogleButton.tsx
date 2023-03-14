@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import GoogleLogin from 'react-google-login';
 
-const GoogleButton = () => {
+interface GoogleButtonProps {
+    clientId: string;
+}
+
+export const GoogleButton = ({clientId}:GoogleButtonProps) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const onSuccess = (response:any) => {
@@ -19,7 +23,7 @@ const GoogleButton = () => {
         <div>You are logged in!</div>
       ) : (
         <GoogleLogin
-          clientId="YOUR_CLIENT_ID"
+          clientId={clientId}
           buttonText="Login with Google"
           onSuccess={onSuccess}
           onFailure={onFailure}
@@ -29,5 +33,3 @@ const GoogleButton = () => {
     </div>
   );
 };
-
-export default GoogleButton;
