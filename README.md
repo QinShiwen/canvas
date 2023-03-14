@@ -35,7 +35,7 @@ A basic painting demo with the functions below:
 
 # Project Logic
 ## Login
-- Auth user (register and log in)
+- Login by using Google Auth
 - Entering a room with roomid(?) especially for the user
 ## Draw
 - paint
@@ -55,7 +55,16 @@ A basic painting demo with the functions below:
 - TypeScript
 - react-color
 - Antd
+
 - Websocket
 ## Backend
 - NodeJS
 - MySQL
+
+
+# Bugs and Solutions
+- "react-google-login" install
+there is a conflict in the peer dependencies required by the packages you are trying to install.  use the --legacy-peer-deps flag, which will allow npm to ignore the peer dependency conflicts and install the packages anyway. This may also cause issues if there are any incompatible dependencies.
+```
+npm install react-google-login --legacy-peer-deps
+```
