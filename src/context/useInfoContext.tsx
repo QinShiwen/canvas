@@ -42,12 +42,13 @@ const InfoProvider = ({ children }: any) => {
     return false;
   };
 
+  const autoLogin = async () => {};
+
   const registerPost = async (
     email: string,
     username: string,
     password: string
   ) => {
-
     axios
       .post("http://localhost:5000/register", {
         email: email,

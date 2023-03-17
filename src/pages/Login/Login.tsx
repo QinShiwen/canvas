@@ -1,7 +1,7 @@
 import { useState,useEffect } from "react";
 import styled from "styled-components";
-import { LoginForm } from "./LoginForm";
-import { RegisterForm } from "./RegisterForm";
+//import { LoginForm } from "./LoginForm";
+//import { RegisterForm } from "./RegisterForm";
 import { GoogleButton } from "./GoogleButton";
 import { gapi } from 'gapi-script';
 
@@ -16,7 +16,7 @@ interface LoginProps {
 
 export const Login = ({ setIsLogin }: LoginProps) => {
   
-  const [isLoginForm, setIsLoginForm] = useState(true);
+  //const [isLoginForm, setIsLoginForm] = useState(true);
 
   const clientId = "770766831574-8ohhs1ihoag6648547c3ngo60sf6jn6m.apps.googleusercontent.com"
 
@@ -32,7 +32,7 @@ export const Login = ({ setIsLogin }: LoginProps) => {
 
   return (
     <Container>
-      <GoogleButton clientId={clientId}/>
+      <GoogleButton clientId={clientId} setIsLogin = {setIsLogin}/>
       {/*
       {isLoginForm ? (
         <FormBox>

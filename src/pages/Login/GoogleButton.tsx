@@ -3,14 +3,21 @@ import GoogleLogin from 'react-google-login';
 
 interface GoogleButtonProps {
     clientId: string;
+    setIsLogin: (value: boolean) => void;
 }
 
-export const GoogleButton = ({clientId}:GoogleButtonProps) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+export const GoogleButton = ({clientId,setIsLogin}:GoogleButtonProps) => {
+  //const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const onSuccess = (response:any) => {
+    
     console.log(response);
-    setIsLoggedIn(true);
+    const profile = response.getBasicProfile();
+    const email = profile.getEmail();
+    const name = profile.getName();
+    const image = profile.getImageUrl();
+    
+    setIsLogin(true);
   };
 
   const onFailure = (response:any) => {
@@ -19,9 +26,6 @@ export const GoogleButton = ({clientId}:GoogleButtonProps) => {
 
   return (
     <div>
-      {isLoggedIn ? (
-        <div>You are logged in!</div>
-      ) : (
         <GoogleLogin
           clientId={clientId}
           buttonText="Login with Google"
@@ -29,7 +33,6 @@ export const GoogleButton = ({clientId}:GoogleButtonProps) => {
           onFailure={onFailure}
           cookiePolicy={'single_host_origin'}
         />
-      )}
     </div>
   );
 };

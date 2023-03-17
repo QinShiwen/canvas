@@ -22,7 +22,8 @@ A basic painting demo with the functions below:
 - data when painting with other users
 ```
 {
-    hostid:string
+    hostid:string;
+    roomid:string;
     users:[{
         userid:string;
         username:string;
@@ -35,7 +36,15 @@ A basic painting demo with the functions below:
 
 # Project Logic
 ## Login
-- Login by using Google Auth
+- Google login  
+    - If its the first time for player to use, then register then login
+        - ifEmailExist
+        - setCookie
+    - Else:
+        - Record the name, email, googleId, roomid to the session
+        - Open Websocket for the room. 
+- autoLogin
+    - Check cookies
 - Entering a room with roomid(?) especially for the user
 ## Draw
 - paint
