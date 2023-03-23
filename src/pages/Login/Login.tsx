@@ -9,12 +9,13 @@ export interface FormProps {
   setIsLoginForm: (value: boolean) => any;
   setIsLogin: (value: boolean) => void;
 }
-
+/*
 interface LoginProps {
   setIsLogin: (value: boolean) => void;
 }
-
-export const Login = ({ setIsLogin }: LoginProps) => {
+*/
+//{ setIsLogin }: LoginProps
+export const Login = () => {
   
   //const [isLoginForm, setIsLoginForm] = useState(true);
 
@@ -32,8 +33,9 @@ export const Login = ({ setIsLogin }: LoginProps) => {
 
   return (
     <Container>
-      <GoogleButton clientId={clientId} setIsLogin = {setIsLogin}/>
+      <GoogleButton clientId={clientId} />
       {/*
+      //setIsLogin = {setIsLogin}
       {isLoginForm ? (
         <FormBox>
           <LoginForm setIsLoginForm={setIsLoginForm} setIsLogin={setIsLogin}/>
