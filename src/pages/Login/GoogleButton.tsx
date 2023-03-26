@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import GoogleLogin from "react-google-login";
 import { useNavigate } from "react-router-dom";
+import { nanoid } from "nanoid";
 
 interface GoogleButtonProps {
   clientId: string;
@@ -9,19 +10,23 @@ interface GoogleButtonProps {
 
 export const GoogleButton = ({ clientId }: GoogleButtonProps) => {
   //const [isLoggedIn, setIsLoggedIn] = useState(false);
+  //generate a random room id
+  const roomId = nanoid(5);
   const history = useNavigate();
   const onSuccess = (response: any) => {
     console.log(response);
     const profile = response.getBasicProfile();
-    const user = {
+    const auth = {
       email: profile.getEmail(),
       name: profile.getName(),
       image: profile.getImageUrl(),
+      roomId: roomId,
     };
     //change the route to canvas?
-    history("/canvas", {
+    sessionStorage.setItem("user", JSON.stringify(auth));
+    history(`/canvas/${roomId}`, {
       state: {
-        user: user,
+        auth:auth,
       },
     });
 
@@ -31,7 +36,6 @@ export const GoogleButton = ({ clientId }: GoogleButtonProps) => {
     const name = profile.getName();
     const image = profile.getImageUrl();
     */
-    sessionStorage.setItem("user", JSON.stringify(user));
 
     //setIsLogin(true);
   };

@@ -3,6 +3,8 @@ import styled from "styled-components";
 import { SketchPicker } from "react-color";
 import { Slider } from "antd";
 import {io, Socket} from 'socket.io-client';
+import { useAuth } from "../../context/AuthContext";
+import { useParams } from "react-router-dom";
 
 interface CanvasProps {
   w: number;
@@ -10,7 +12,7 @@ interface CanvasProps {
 }
 
 export const Canvas = ({ w, h }: CanvasProps) => {
-
+  const { roomid } = useParams<{roomid: string | undefined}>();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [color, setColor] = useState("#000000");
@@ -81,16 +83,9 @@ export const Canvas = ({ w, h }: CanvasProps) => {
   };
 
   useEffect(() => {
-    socketRef.current = io("http://localhost:8080");
-    //connect the websocket
-    socketRef.current.on("connect",()=>{
-      console.log("connected");
-    })
-    socketRef.current.on("drawing",(data)=>{
-      //console.log(data);
-      
-    })
-  }, []);
+    console.log(roomid);
+    
+  }, [roomid]);
 
   return (
     <Container>

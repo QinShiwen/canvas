@@ -16,7 +16,7 @@ function App() {
     <Container>
       <BrowserRouter>
       <Routes>
-        <Route path = "/canvas" element = {<Canvas w={800} h={500} />}/>
+        <Route path = "/canvas/:roomid" element = {<Canvas w={800} h={500} />}/>
         <Route path = "/login" element = {<Login />}/>
       </Routes>
       </BrowserRouter>
