@@ -38,7 +38,7 @@ A basic painting demo with the functions below:
 ## Router Setting
 - Login
 - Canvas
-### Login
+## Login
 - Google login  
     - If its the first time for player to use, then register then login
         - ifEmailExist
@@ -49,13 +49,30 @@ A basic painting demo with the functions below:
 - autoLogin
     - Check cookies
 - Entering a room with roomid(?) especially for the user
-### Draw
-- paint
+## Draw
+### paint
+- canvas data:
+```
+[
+    {
+        color:string;
+        size:number;
+        lines:[
+            x:number;
+            y:number;
+        ]
+    }
+]
+```
+###
 - claer canvas
 - download canvas
 - change the size and color of the pen 
 - Adjust the size of canvas
 - Share link to others to draw together 
+
+
+
 
 # Install
 - Input `npm install` in the terminal to install the dependencies

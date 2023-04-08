@@ -2,23 +2,39 @@ import React, { useRef, useEffect, useState } from "react";
 import styled from "styled-components";
 import { SketchPicker } from "react-color";
 import { Slider } from "antd";
-import {io, Socket} from 'socket.io-client';
 import { useAuth } from "../../context/AuthContext";
 import { useParams } from "react-router-dom";
+import WebSocket from "ws";
+
+const SERVER_URL = "";
 
 interface CanvasProps {
   w: number;
   h: number;
 }
 
+interface Point {
+  x: number;
+  y: number;
+}
+
+interface Line {
+  start: Point;
+  end: Point;
+}
+
 export const Canvas = ({ w, h }: CanvasProps) => {
-  const { roomid } = useParams<{roomid: string | undefined}>();
+  const { roomid } = useParams<{ roomid: string | undefined }>();
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
   const [isDrawing, setIsDrawing] = useState(false);
   const [color, setColor] = useState("#000000");
   const [colorPickerVisible, setColorPickerVisible] = useState(false);
   const [penSize, setPenSize] = useState(5);
-  const socketRef = useRef<Socket>();
+  //store all the lines on the canvas
+  const [lines, setLines] = useState<Line[]>([]);
+
+  const [socket, setSocket] = useState<WebSocket | null>(null);
 
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
@@ -84,7 +100,26 @@ export const Canvas = ({ w, h }: CanvasProps) => {
 
   useEffect(() => {
     console.log(roomid);
-    
+    const newSocket = new WebSocket(SERVER_URL);
+    console.log(111);
+    //
+    newSocket.addEventListener("open", () => {
+      console.log("WebSocket connected");
+    });
+    //监听收到的数据
+    newSocket.addEventListener("message", (event: any) => {
+      const data = JSON.parse(event.data);
+      if (data.type === "draw") {
+        const { start, end } = data.payload;
+        setLines((lines) => [...lines, { start, end }]);
+      }
+    });
+
+    newSocket.addEventListener("close", () => {
+      console.log("WebSocket disconnected");
+    });
+
+    setSocket(newSocket);
   }, [roomid]);
 
   return (
@@ -101,9 +136,9 @@ export const Canvas = ({ w, h }: CanvasProps) => {
             onChange={(newColor) => setColor(newColor.hex)}
           />
         </div>
-        <div className="pen-slide-box" style = {{padding:0}}>
+        <div className="pen-slide-box" style={{ padding: 0 }}>
           <button onClick={() => Resize(0.8)}>-</button>
-            canvas size
+          canvas size
           <button onClick={() => Resize(1.2)}>+</button>
         </div>
         <div className="pen-slide-box">
@@ -170,7 +205,7 @@ const ToolBar = styled.div`
     padding: 0 10px;
     border-radius: 5px;
     margin: 10px;
-    button{
+    button {
       background-color: purple;
       color: white;
       height: 20px;
