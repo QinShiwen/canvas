@@ -48,10 +48,20 @@ export function CanvasUpdate({ w, h }: CanvasProps) {
 
   //tell the server to draw the line
   function sendLine(line: Line) {
-    drawLine(line);
+    const data = {
+      type: "draw",
+      line: line,
+    }
     ws.onopen = () => {
-      ws.send(JSON.stringify(line));
+      ws.send(JSON.stringify(data));
     };
+  }
+
+  function shareLink(){
+    setIsMultiMood(true);
+    //copy the link to the clipboard
+    navigator.clipboard.writeText(window.location.href);
+
   }
 
   function MouseDown(e: any) {
@@ -89,15 +99,16 @@ export function CanvasUpdate({ w, h }: CanvasProps) {
   };
 
   useEffect(() => {
-
     if (isMultiMood) {
       const ws = new WebSocket("ws://localhost:8080");
       ws.onopen = () => {
         console.log("connected");
       };
       ws.onmessage = (e: any) => {
-        const line = JSON.parse(e.data);
-        drawLine(line);
+        const data = JSON.parse(e.data);
+        if(data.type === "draw"){
+          drawLine(data.line);
+        }
       };
       setWs(ws);
     }
@@ -126,7 +137,7 @@ export function CanvasUpdate({ w, h }: CanvasProps) {
             onChange={(v) => setPenSize(v)}
           />
         </div>
-        <button>Share</button>
+        <button onClick={shareLink}>Share</button>
       </ToolBar>
       <canvas
         ref={canvasRef}

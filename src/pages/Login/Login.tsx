@@ -9,15 +9,8 @@ export interface FormProps {
   setIsLoginForm: (value: boolean) => any;
   setIsLogin: (value: boolean) => void;
 }
-/*
-interface LoginProps {
-  setIsLogin: (value: boolean) => void;
-}
-*/
-//{ setIsLogin }: LoginProps
+
 export const Login = () => {
-  
-  //const [isLoginForm, setIsLoginForm] = useState(true);
 
   const clientId = "770766831574-8ohhs1ihoag6648547c3ngo60sf6jn6m.apps.googleusercontent.com"
 
