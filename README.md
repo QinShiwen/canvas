@@ -1,15 +1,15 @@
-
 # Intro
 A basic painting demo with the functions below:
 - paint
 - claer canvas
 - download canvas
-- change the size and color of the pen 
+- change the size and color of the pen
 - Adjust the size of canvas
 - Share link to others to draw together
 
 # Data Structure Design
 - user data for auth
+
 ```
 {
     userid:string;
@@ -19,7 +19,9 @@ A basic painting demo with the functions below:
     roomid:string;
 }
 ```
+
 - data when painting with other users
+
 ```
 {
     hostid:string;
@@ -28,8 +30,19 @@ A basic painting demo with the functions below:
         userid:string;
         username:string;
     }]
-    paintingInfo:[   //points in the canvas
-
+    paintingInfo:[   //lines in the canvas
+        [{
+            color:string;
+            size:number;
+            start:{ x:number; y:number }
+            end:{ x:number; y:number }
+        },{...},{..}],
+        [{
+            color:string;
+            size:number;
+            start:{ x:number; y:number }
+            end:{ x:number; y:number }
+        }]
     ]
 }
 ```
@@ -39,40 +52,39 @@ A basic painting demo with the functions below:
 - Login
 - Canvas
 ## Login
-- Google login  
-    - If its the first time for player to use, then register then login
-        - ifEmailExist
-        - setCookie
-    - Else:
-        - Record the name, email, googleId, roomid to the session
-        - Open Websocket for the room. 
+- Google login
+  - If its the first time for player to use, then register then login
+    - ifEmailExist
+    - setCookie
+  - Else:
+    - Record the name, email, googleId, roomid to the session
+    - Open Websocket for the room.
 - autoLogin
-    - Check cookies
+  - Check cookies
 - Entering a room with roomid(?) especially for the user
-## Draw
-### paint
+## Canvas
+### Paint
+- states
+    - startDraw
+    - drawing
+    - finishDraw
 - canvas data:
 ```
 [
     {
         color:string;
         size:number;
-        lines:[
-            x:number;
-            y:number;
-        ]
+        start:{ x:number; y:number }
+        end:{ x:number; y:number }
     }
 ]
 ```
-###
+### others
 - claer canvas
 - download canvas
-- change the size and color of the pen 
+- change the size and color of the pen
 - Adjust the size of canvas
-- Share link to others to draw together 
-
-
-
+- Share link to others to draw together
 
 # Install
 - Input `npm install` in the terminal to install the dependencies
@@ -86,14 +98,14 @@ A basic painting demo with the functions below:
 - Antd
 - react-google-login
 - Websocket
+
 ## Backend
 - NodeJS
-- Mongoose 
-
+- Mongoose
 
 # Bugs and Solutions
 ### "react-google-login" install
-- There is a conflict in the peer dependencies required by the packages you are trying to install. 
+- There is a conflict in the peer dependencies required by the packages you are trying to install.
 - Use the --legacy-peer-deps flag, which will allow npm to ignore the peer dependency conflicts and install the packages anyway. This may also cause issues if there are any incompatible dependencies.
 ```
 npm install react-google-login --legacy-peer-deps

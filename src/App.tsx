@@ -1,7 +1,7 @@
 import { useEffect, } from "react";
 import styled from "styled-components";
 import "./App.css";
-import { Canvas } from "./pages/Paint/Canvas";
+import { CanvasUpdate } from "./pages/Paint/CanvasUpdate";
 import { Login } from "./pages/Login/Login";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
@@ -16,7 +16,7 @@ function App() {
     <Container>
       <BrowserRouter>
       <Routes>
-        <Route path = "/canvas/:roomid" element = {<Canvas w={800} h={500} />}/>
+        <Route path = "/canvas/:roomid" element = {<CanvasUpdate  w={800} h={500} />}/>
         <Route path = "/login" element = {<Login />}/>
       </Routes>
       </BrowserRouter>

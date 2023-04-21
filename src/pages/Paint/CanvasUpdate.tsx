@@ -1,12 +1,8 @@
+import WebSocket from "ws";
 import React, { useRef, useEffect, useState } from "react";
 import styled from "styled-components";
 import { SketchPicker } from "react-color";
 import { Slider } from "antd";
-import { useAuth } from "../../context/AuthContext";
-import { useParams } from "react-router-dom";
-import WebSocket from "ws";
-
-const SERVER_URL = "";
 
 interface CanvasProps {
   w: number;
@@ -23,52 +19,59 @@ interface Line {
   end: Point;
 }
 
-export const Canvas = ({ w, h }: CanvasProps) => {
-  const { roomid } = useParams<{ roomid: string | undefined }>();
+export function CanvasUpdate({ w, h }: CanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [canvas, setCanvas] = useState<HTMLCanvasElement>(canvasRef.current!);
 
   const [isDrawing, setIsDrawing] = useState(false);
+  const [isMultiMood, setIsMultiMood] = useState(false);
+  const [lastPos, setLastPos] = useState<Point>({ x: 0, y: 0 });
   const [color, setColor] = useState("#000000");
   const [colorPickerVisible, setColorPickerVisible] = useState(false);
   const [penSize, setPenSize] = useState(5);
-  //store all the lines on the canvas
-  const [lines, setLines] = useState<Line[]>([]);
+  const [ws, setWs] = useState<any>(null);
+  //const [line,setLine] = useState<Line>({start:{x:0,y:0},end:{x:0,y:0}});
+  //const [lines, setLines] = useState<Line[]>([]);
 
-  const [socket, setSocket] = useState<WebSocket | null>(null);
-
-  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current;
-    if (canvas) {
-      const ctx = canvas?.getContext("2d");
-      ctx?.beginPath();
-      //console.log(canvas?.offsetTop, canvas?.offsetLeft);
-      ctx?.moveTo(e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop);
-      setIsDrawing(true);
-    }
-  };
-
-  const finishDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current;
-    const ctx = canvas?.getContext("2d");
-    ctx?.closePath();
-    setIsDrawing(false);
-  };
-
-  const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!isDrawing) return;
+  function drawLine(line: Line) {
     const canvas = canvasRef.current;
     if (canvas) {
       const ctx = canvas?.getContext("2d");
       if (ctx) {
-        ctx.lineCap = "round";
-        ctx.strokeStyle = color;
-        ctx.lineWidth = penSize;
+        ctx.beginPath();
+        ctx.moveTo(line.start.x, line.start.y);
+        ctx.lineTo(line.end.x, line.end.y);
+        ctx.stroke();
       }
-      ctx?.lineTo(e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop);
-      //console.log(e.pageX-canvas.offsetTop, e.pageY-canvas.offsetLeft)
-      ctx?.stroke();
     }
-  };
+  }
+
+  //tell the server to draw the line
+  function sendLine(line: Line) {
+    drawLine(line);
+    ws.onopen = () => {
+      ws.send(JSON.stringify(line));
+    };
+  }
+
+  function MouseDown(e: any) {
+    setIsDrawing(true);
+    setLastPos({ x: e.pageX - canvas.offsetLeft, y: e.pageY - canvas.offsetTop });
+  }
+
+  function MouseMove(e: any) {
+    if (isDrawing) {
+      const newPos = { x: e.pageX - canvas.offsetLeft, y: e.pageY - canvas.offsetTop };
+      const line = { start: lastPos, end: newPos };
+      setLastPos(newPos);
+      drawLine(line);
+      sendLine(line);
+    }
+  }
+
+  function MouseUp(e: any) {
+    setIsDrawing(false);
+  }
 
   const clear = () => {
     const canvas = canvasRef.current;
@@ -85,42 +88,20 @@ export const Canvas = ({ w, h }: CanvasProps) => {
     link.click();
   };
 
-  const Resize = (multiple: number) => {
-    const canvas = canvasRef.current;
-    if (canvas) {
-      const ctx = canvas?.getContext("2d");
-      if (ctx) {
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        canvas.width = canvas.width * multiple;
-        canvas.height = canvas.height * multiple;
-        ctx.putImageData(imageData, 0, 0);
-      }
-    }
-  };
-
   useEffect(() => {
-    console.log(roomid);
-    const newSocket = new WebSocket(SERVER_URL);
-    console.log(111);
-    //监听连接成功
-    newSocket.addEventListener("open", () => {
-      console.log("WebSocket connected");
-    });
-    //监听收到的数据
-    newSocket.addEventListener("message", (event: any) => {
-      const data = JSON.parse(event.data);
-      if (data.type === "draw") {
-        const { start, end } = data.payload;
-        setLines((lines) => [...lines, { start, end }]);
-      }
-    });
 
-    newSocket.addEventListener("close", () => {
-      console.log("WebSocket disconnected");
-    });
-
-    setSocket(newSocket);
-  }, [roomid]);
+    if (isMultiMood) {
+      const ws = new WebSocket("ws://localhost:8080");
+      ws.onopen = () => {
+        console.log("connected");
+      };
+      ws.onmessage = (e: any) => {
+        const line = JSON.parse(e.data);
+        drawLine(line);
+      };
+      setWs(ws);
+    }
+  });
 
   return (
     <Container>
@@ -135,11 +116,6 @@ export const Canvas = ({ w, h }: CanvasProps) => {
             color={color}
             onChange={(newColor) => setColor(newColor.hex)}
           />
-        </div>
-        <div className="pen-slide-box" style={{ padding: 0 }}>
-          <button onClick={() => Resize(0.8)}>-</button>
-          canvas size
-          <button onClick={() => Resize(1.2)}>+</button>
         </div>
         <div className="pen-slide-box">
           Pen Size
@@ -156,13 +132,13 @@ export const Canvas = ({ w, h }: CanvasProps) => {
         ref={canvasRef}
         width={w}
         height={h}
-        onMouseDown={(e) => startDrawing(e)}
-        onMouseUp={(e) => finishDrawing(e)}
-        onMouseMove={(e) => draw(e)}
+        onMouseDown={(e) => MouseDown(e)}
+        onMouseUp={(e) => MouseUp(e)}
+        onMouseMove={(e) => MouseMove(e)}
       />
     </Container>
   );
-};
+}
 
 const Container = styled.div`
   display: flex;
