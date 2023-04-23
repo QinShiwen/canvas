@@ -1,8 +1,12 @@
-import WebSocket from "ws";
-import React, { useRef, useEffect, useState } from "react";
+//import WebSocket from "ws";
+import  { useRef, useEffect, useState } from "react";
 import styled from "styled-components";
 import { SketchPicker } from "react-color";
 import { Slider } from "antd";
+import { UsersBar } from "./UsersBar";
+import { nanoid } from "nanoid";
+import {io,Socket } from 'socket.io-client';
+//import { useWebsocket } from "../useWebsocket";
 
 interface CanvasProps {
   w: number;
@@ -20,16 +24,19 @@ interface Line {
 }
 
 export function CanvasUpdate({ w, h }: CanvasProps) {
+  const username = nanoid(5);
+  const [socket, setSocket] = useState<Socket|null>(null);
+  //const ws = useRef<WebSocket | null>(null);
+  //const [wss, setWss] = useState<WebSocket>(ws.current!);
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [canvas, setCanvas] = useState<HTMLCanvasElement>(canvasRef.current!);
 
   const [isDrawing, setIsDrawing] = useState(false);
-  const [isMultiMood, setIsMultiMood] = useState(false);
   const [lastPos, setLastPos] = useState<Point>({ x: 0, y: 0 });
   const [color, setColor] = useState("#000000");
   const [colorPickerVisible, setColorPickerVisible] = useState(false);
   const [penSize, setPenSize] = useState(5);
-  const [ws, setWs] = useState<any>(null);
   //const [line,setLine] = useState<Line>({start:{x:0,y:0},end:{x:0,y:0}});
   //const [lines, setLines] = useState<Line[]>([]);
 
@@ -51,31 +58,34 @@ export function CanvasUpdate({ w, h }: CanvasProps) {
     const data = {
       type: "draw",
       line: line,
-    }
-    ws.onopen = () => {
-      ws.send(JSON.stringify(data));
     };
+    
+    socket?.emit("draw", data);
   }
 
-  function shareLink(){
-    setIsMultiMood(true);
+  function shareLink() {
     //copy the link to the clipboard
     navigator.clipboard.writeText(window.location.href);
-
   }
 
   function MouseDown(e: any) {
     setIsDrawing(true);
-    setLastPos({ x: e.pageX - canvas.offsetLeft, y: e.pageY - canvas.offsetTop });
+    setLastPos({
+      x: e.pageX - canvas.offsetLeft,
+      y: e.pageY - canvas.offsetTop,
+    });
   }
 
   function MouseMove(e: any) {
     if (isDrawing) {
-      const newPos = { x: e.pageX - canvas.offsetLeft, y: e.pageY - canvas.offsetTop };
+      const newPos = {
+        x: e.pageX - canvas.offsetLeft,
+        y: e.pageY - canvas.offsetTop,
+      };
       const line = { start: lastPos, end: newPos };
       setLastPos(newPos);
       drawLine(line);
-      sendLine(line);
+      //sendLine(line);
     }
   }
 
@@ -98,24 +108,29 @@ export function CanvasUpdate({ w, h }: CanvasProps) {
     link.click();
   };
 
+
   useEffect(() => {
-    if (isMultiMood) {
-      const ws = new WebSocket("ws://localhost:8080");
-      ws.onopen = () => {
-        console.log("connected");
-      };
-      ws.onmessage = (e: any) => {
-        const data = JSON.parse(e.data);
-        if(data.type === "draw"){
-          drawLine(data.line);
-        }
-      };
-      setWs(ws);
-    }
-  });
+
+    const newSocket = io('http://localhost:1000');
+    setCanvas(canvasRef.current!);
+
+    newSocket.on('connect', () => {
+      console.log('connected');
+    });
+
+    newSocket.on('disconnect', () => {
+      console.log('disconnected');
+    });
+
+    newSocket.on('draw', (message: any) => {
+      console.log(message);
+    });
+    setSocket(newSocket);
+  }, [socket]);
 
   return (
     <Container>
+      <UsersBar />
       <ToolBar>
         <button onClick={clear}>Clear</button>
         <button onClick={download}>Download</button>

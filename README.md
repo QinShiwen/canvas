@@ -110,3 +110,6 @@ A basic painting demo with the functions below:
 ```
 npm install react-google-login --legacy-peer-deps
 ```
+
+你好，我先做一款多人绘画游戏，只要有人进入我的网站URL即可一起画画，包含功能有：绘制，调整画笔颜色和大小等。
+前端用React和TypeScript实现，后端用Node.Js实现，要开启Websocket的服务，请写出代码
