@@ -101,6 +101,7 @@ A basic painting demo with the functions below:
 
 ## Backend
 - NodeJS
+- ws module
 - Mongoose
 
 # Bugs and Solutions

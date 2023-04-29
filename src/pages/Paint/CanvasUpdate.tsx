@@ -1,4 +1,4 @@
-//import WebSocket from "ws";
+
 import  { useRef, useEffect, useState } from "react";
 import styled from "styled-components";
 import { SketchPicker } from "react-color";
@@ -6,7 +6,7 @@ import { Slider } from "antd";
 import { UsersBar } from "./UsersBar";
 import { nanoid } from "nanoid";
 import {io,Socket } from 'socket.io-client';
-//import { useWebsocket } from "../useWebsocket";
+import { ChatBox } from "./ChatBox";
 
 interface CanvasProps {
   w: number;
@@ -25,11 +25,13 @@ interface Line {
 
 export function CanvasUpdate({ w, h }: CanvasProps) {
   const username = nanoid(5);
-  const [socket, setSocket] = useState<Socket|null>(null);
-  //const ws = useRef<WebSocket | null>(null);
-  //const [wss, setWss] = useState<WebSocket>(ws.current!);
+
+  //const [socket, setSocket] = useState<Socket>(io('http://localhost:1000'));
+
+  const [players, setPlayers] = useState<string[]>([username]);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
   const [canvas, setCanvas] = useState<HTMLCanvasElement>(canvasRef.current!);
 
   const [isDrawing, setIsDrawing] = useState(false);
@@ -37,8 +39,6 @@ export function CanvasUpdate({ w, h }: CanvasProps) {
   const [color, setColor] = useState("#000000");
   const [colorPickerVisible, setColorPickerVisible] = useState(false);
   const [penSize, setPenSize] = useState(5);
-  //const [line,setLine] = useState<Line>({start:{x:0,y:0},end:{x:0,y:0}});
-  //const [lines, setLines] = useState<Line[]>([]);
 
   function drawLine(line: Line) {
     const canvas = canvasRef.current;
@@ -60,7 +60,8 @@ export function CanvasUpdate({ w, h }: CanvasProps) {
       line: line,
     };
     
-    socket?.emit("draw", data);
+    //socket?.emit("message", data);
+    //console.log(socket, data);
   }
 
   function shareLink() {
@@ -85,7 +86,7 @@ export function CanvasUpdate({ w, h }: CanvasProps) {
       const line = { start: lastPos, end: newPos };
       setLastPos(newPos);
       drawLine(line);
-      //sendLine(line);
+      sendLine(line);
     }
   }
 
@@ -110,27 +111,32 @@ export function CanvasUpdate({ w, h }: CanvasProps) {
 
 
   useEffect(() => {
-
-    const newSocket = io('http://localhost:1000');
     setCanvas(canvasRef.current!);
-
-    newSocket.on('connect', () => {
+    //const newSocket = io('http://localhost:1000');
+    /*
+    
+    
+    socket.on('connect', () => {
       console.log('connected');
     });
 
-    newSocket.on('disconnect', () => {
+    socket.on('disconnect', () => {
       console.log('disconnected');
     });
 
-    newSocket.on('draw', (message: any) => {
+    socket.on('draw', (message: any) => {
       console.log(message);
     });
-    setSocket(newSocket);
-  }, [socket]);
+
+    console.log(socket);
+    */
+    //setSocket(newSocket);
+  }, [canvas]);
 
   return (
     <Container>
-      <UsersBar />
+      <UsersBar players={players}/>
+      <ChatBox />
       <ToolBar>
         <button onClick={clear}>Clear</button>
         <button onClick={download}>Download</button>
