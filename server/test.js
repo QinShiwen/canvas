@@ -1,23 +1,26 @@
-import { WebSocketServer } from 'ws';
+const uuidv4 = require("uuid");
+const http = require("http");
+const WebSocketServer = require("ws");
 
-const wss = new WebSocketServer({ port: 1000 });
 
-console.log('server started');
-console.log(wss);
+console.log("test");
 
-wss.on('connection', function connection(ws) {
+const server = http.createServer();
+const port = 1000;
 
-  console.log('connected');
-
-  ws.send('something');
-
-  ws.on('error', console.error);
-
-  ws.on('message', function message(data) {
-    console.log('received: %s', data);
-  });
-
- 
+server.listen(port, () => {
+  console.log("server started");
 });
 
-console.log('server test');
+const wsSever = new WebSocketServer.Server({server});
+
+const clients = {}
+console.log(wsSever.address());
+
+wsSever.on("connection", (connection) => {
+  console.log("connected");
+  const userId = uuidv4();
+  clients[userId] = connection;
+  console.log(`${userId} connected.`);
+
+});

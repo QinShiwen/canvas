@@ -1,12 +1,11 @@
-
-import  { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import styled from "styled-components";
 import { SketchPicker } from "react-color";
 import { Slider } from "antd";
 import { UsersBar } from "./UsersBar";
 import { nanoid } from "nanoid";
-import {io,Socket } from 'socket.io-client';
 import { ChatBox } from "./ChatBox";
+import useWebsocket from "react-use-websocket";
 
 interface CanvasProps {
   w: number;
@@ -24,6 +23,20 @@ interface Line {
 }
 
 export function CanvasUpdate({ w, h }: CanvasProps) {
+
+  useWebsocket("ws://localhost:8080", {
+
+    onOpen: () => console.log("opened"),
+
+    onMessage: (event) => {
+      console.log("message", event.data)
+    },
+
+    onClose: () => console.log("closed"),
+    
+    shouldReconnect: (closeEvent) => true,
+  });
+
   const username = nanoid(5);
 
   //const [socket, setSocket] = useState<Socket>(io('http://localhost:1000'));
@@ -42,6 +55,7 @@ export function CanvasUpdate({ w, h }: CanvasProps) {
 
   function drawLine(line: Line) {
     const canvas = canvasRef.current;
+
     if (canvas) {
       const ctx = canvas?.getContext("2d");
       if (ctx) {
@@ -59,7 +73,7 @@ export function CanvasUpdate({ w, h }: CanvasProps) {
       type: "draw",
       line: line,
     };
-    
+
     //socket?.emit("message", data);
     //console.log(socket, data);
   }
@@ -109,33 +123,14 @@ export function CanvasUpdate({ w, h }: CanvasProps) {
     link.click();
   };
 
-
   useEffect(() => {
     setCanvas(canvasRef.current!);
-    //const newSocket = io('http://localhost:1000');
-    /*
-    
-    
-    socket.on('connect', () => {
-      console.log('connected');
-    });
-
-    socket.on('disconnect', () => {
-      console.log('disconnected');
-    });
-
-    socket.on('draw', (message: any) => {
-      console.log(message);
-    });
-
-    console.log(socket);
-    */
-    //setSocket(newSocket);
+ 
   }, [canvas]);
 
   return (
     <Container>
-      <UsersBar players={players}/>
+      <UsersBar players={players} />
       <ChatBox />
       <ToolBar>
         <button onClick={clear}>Clear</button>

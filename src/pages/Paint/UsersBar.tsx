@@ -10,8 +10,8 @@ export function UsersBar({ players }: UsersBarProps) {
     <Container>
       <div className="title">Players</div>
       <div className="view">
-        {players.map((player) => {
-          return <div>{player}</div>;
+        {players.map((player,index) => {
+          return <div key = {index}>{player}</div>;
         })}
       </div>
     </Container>
