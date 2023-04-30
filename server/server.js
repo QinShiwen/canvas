@@ -10,6 +10,7 @@ server.on("connection", function connection(ws) {
   ws.on("message", function incoming(message) {
     console.log("received: %s", message);
   });
+  
 });
 
 console.log("WebSocket server running on port 8080");

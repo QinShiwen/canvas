@@ -6,6 +6,7 @@ import { UsersBar } from "./UsersBar";
 import { nanoid } from "nanoid";
 import { ChatBox } from "./ChatBox";
 import useWebsocket from "react-use-websocket";
+import { FuncButton } from "./FuncButton";
 
 interface CanvasProps {
   w: number;
@@ -23,17 +24,15 @@ interface Line {
 }
 
 export function CanvasUpdate({ w, h }: CanvasProps) {
-
   useWebsocket("ws://localhost:8080", {
-
     onOpen: () => console.log("opened"),
 
     onMessage: (event) => {
-      console.log("message", event.data)
+      console.log("message", event.data);
     },
 
     onClose: () => console.log("closed"),
-    
+
     shouldReconnect: (closeEvent) => true,
   });
 
@@ -123,9 +122,12 @@ export function CanvasUpdate({ w, h }: CanvasProps) {
     link.click();
   };
 
+  const functionArray = [clear, download, shareLink];
+
+  const functionNames = ["Clear", "Download", "Share"];
+
   useEffect(() => {
     setCanvas(canvasRef.current!);
- 
   }, [canvas]);
 
   return (
@@ -133,10 +135,11 @@ export function CanvasUpdate({ w, h }: CanvasProps) {
       <UsersBar players={players} />
       <ChatBox />
       <ToolBar>
-        <button onClick={clear}>Clear</button>
-        <button onClick={download}>Download</button>
+        {functionArray.map((func, index) => {
+          return <FuncButton onClick={func} name={functionNames[index]} />;
+        })}
         <button onClick={() => setColorPickerVisible(!colorPickerVisible)}>
-          <div style={{ backgroundColor: color, width: 25, height: 25 }}></div>
+          <div style={{ backgroundColor: color, width: "100%", height: "100%", borderRadius:"25px" }}></div>
         </button>
         <div style={{ display: colorPickerVisible ? "block" : "none" }}>
           <SketchPicker
@@ -153,7 +156,6 @@ export function CanvasUpdate({ w, h }: CanvasProps) {
             onChange={(v) => setPenSize(v)}
           />
         </div>
-        <button onClick={shareLink}>Share</button>
       </ToolBar>
       <canvas
         ref={canvasRef}
@@ -168,17 +170,34 @@ export function CanvasUpdate({ w, h }: CanvasProps) {
 }
 
 const Container = styled.div`
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(180.96deg, #220942 1.92%, #ffffff 125.8%);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+
   canvas {
     background-color: white;
     border-radius: 5px;
+    box-shadow: 0px 0px 0.297908px rgba(66, 71, 76, 0.32),
+      0px 2.38326px 4.76653px rgba(66, 71, 76, 0.05),
+      0px 2.38326px 23.8326px #eeeeee;
+    border-radius: 48.5944px;
   }
 `;
 
 const ToolBar = styled.div`
+  background: #55426d;
+  /* Off white */
+
+  box-shadow: 0px 4px 30px rgba(74, 74, 74, 0.05);
+  border-radius: 0px 0px 25px 25px;
+  position: absolute;
+  top: 0;
+  padding: 10px;
+
   z-index: 1;
   display: flex;
   flex-direction: row;
@@ -187,12 +206,19 @@ const ToolBar = styled.div`
 
   button {
     margin: 10px;
-    height: 30px;
+    background: #cdaeff;
+    box-shadow: 1px 1px 10px #444444;
+    border-radius: 10px;
+    width: 100px;
+    height: 40px;
+    background-color: #ffffff;
+    border: 2px solid #f2f2f2;
+    box-shadow: 0px 4px 30px rgba(74, 74, 74, 0.05);
+    border-radius: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     cursor: pointer;
-    background-color: white;
-    border-radius: 5px;
-    outline: none;
-    border: none;
   }
   .sketch-picker {
     position: absolute;
