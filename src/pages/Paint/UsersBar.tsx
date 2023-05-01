@@ -2,7 +2,11 @@ import React, { useRef, useEffect, useState } from "react";
 import styled from "styled-components";
 
 interface UsersBarProps {
-  players: string[];
+  players: Players[];
+}
+
+interface Players {
+  name: string;
 }
 
 export function UsersBar({ players }: UsersBarProps) {
@@ -15,7 +19,7 @@ export function UsersBar({ players }: UsersBarProps) {
         {players.map((player, index) => {
           return ( 
             <div className = "player" key={index}>
-              {player}
+              {player.name}
             </div>
           );
         })}

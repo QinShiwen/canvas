@@ -24,14 +24,42 @@ interface Line {
 }
 
 export function CanvasUpdate({ w, h }: CanvasProps) {
-  useWebsocket("ws://localhost:8080", {
-    onOpen: () => console.log("opened"),
+  function isJSON(str: string) {
+    try {
+      JSON.parse(str);
+    } catch (e) {
+      return false;
+    }
+    return true;
+  }
 
-    onMessage: (event) => {
-      console.log("message", event.data);
+  const { sendJsonMessage } = useWebsocket("ws://localhost:8080", {
+    onOpen: () => {
+      console.log("opened");
+      const data = {
+        type: "join",
+        userinfo: {
+          name: username,
+        },
+      }
+      sendJsonMessage(data);
     },
 
-    onClose: () => console.log("closed"),
+    onMessage: (event) => {
+      console.log(!isJSON(event.data), event.data);
+      if (!isJSON(event.data)) {
+        return;
+      }
+      const data = JSON.parse(event.data);
+      if (data.type === "updatePlayers") {
+        console.log(data);
+        setPlayers(data.data);
+      }
+    },
+
+    onClose: () => {
+      console.log("closed")
+    },
 
     shouldReconnect: (closeEvent) => true,
   });
@@ -40,7 +68,7 @@ export function CanvasUpdate({ w, h }: CanvasProps) {
 
   //const [socket, setSocket] = useState<Socket>(io('http://localhost:1000'));
 
-  const [players, setPlayers] = useState<string[]>([username]);
+  const [players, setPlayers] = useState<any[]>([]);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -136,10 +164,23 @@ export function CanvasUpdate({ w, h }: CanvasProps) {
       <ChatBox />
       <ToolBar>
         {functionArray.map((func, index) => {
-          return <FuncButton onClick={func} name={functionNames[index]} />;
+          return (
+            <FuncButton
+              onClick={func}
+              name={functionNames[index]}
+              key={index}
+            />
+          );
         })}
         <button onClick={() => setColorPickerVisible(!colorPickerVisible)}>
-          <div style={{ backgroundColor: color, width: "100%", height: "100%", borderRadius:"25px" }}></div>
+          <div
+            style={{
+              backgroundColor: color,
+              width: "100%",
+              height: "100%",
+              borderRadius: "25px",
+            }}
+          ></div>
         </button>
         <div style={{ display: colorPickerVisible ? "block" : "none" }}>
           <SketchPicker

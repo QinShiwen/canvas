@@ -8,8 +8,7 @@ A basic painting demo with the functions below:
 - Share link to others to draw together
 
 # Data Structure Design
-- user data for auth
-
+## user data for auth
 ```
 {
     userid:string;
@@ -19,9 +18,7 @@ A basic painting demo with the functions below:
     roomid:string;
 }
 ```
-
-- data when painting with other users
-
+## data when painting with other users
 ```
 {
     hostid:string;
@@ -45,6 +42,14 @@ A basic painting demo with the functions below:
         }]
     ]
 }
+```
+## data in the room
+- players
+```
+[ {
+    name: string;
+    icon: any; 
+} ]
 ```
 
 # Project Logic
@@ -85,6 +90,12 @@ A basic painting demo with the functions below:
 - change the size and color of the pen
 - Adjust the size of canvas
 - Share link to others to draw together
+### When to use Websocket?
+- Enter room
+    - updatePlayers
+- Paint
+- Chat
+
 
 # Install
 - Input `npm install` in the terminal to install the dependencies
