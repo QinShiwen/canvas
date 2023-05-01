@@ -41,7 +41,7 @@ export function CanvasUpdate({ w, h }: CanvasProps) {
         userinfo: {
           name: username,
         },
-      }
+      };
       sendJsonMessage(data);
     },
 
@@ -58,15 +58,20 @@ export function CanvasUpdate({ w, h }: CanvasProps) {
     },
 
     onClose: () => {
-      console.log("closed")
+      const data = {
+        type: "leave",
+        userinfo: {
+          name: username,
+        },
+      };
+      sendJsonMessage(data);
+      console.log("closed");
     },
 
     shouldReconnect: (closeEvent) => true,
   });
 
   const username = nanoid(5);
-
-  //const [socket, setSocket] = useState<Socket>(io('http://localhost:1000'));
 
   const [players, setPlayers] = useState<any[]>([]);
 

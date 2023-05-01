@@ -82,5 +82,9 @@ const Container = styled.div`
       align-items: center;
       border-bottom: 1px solid #361c60;
     }
+
+    .player:last-child {
+      border-bottom: none;
+    }
   }
 `;

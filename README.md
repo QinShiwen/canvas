@@ -91,7 +91,7 @@ A basic painting demo with the functions below:
 - Adjust the size of canvas
 - Share link to others to draw together
 ### When to use Websocket?
-- Enter room
+- Enter room & Leave room
     - updatePlayers
 - Paint
 - Chat

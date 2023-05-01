@@ -12,48 +12,45 @@ server.on("connection", function connection(ws) {
   ws.send("Hello, WebSocket!");
 
   ws.on("message", function incoming(message) {
-
     message = JSON.parse(message);
 
     if (message.type === "join") {
-      
+
+      //console.log("join", message);
       clientsInfo.push(message.userinfo);
-      console.log("join", message);
-      clients.forEach(function (client) {
-        if (client.readyState === WebSocket.OPEN) {
+      ws.name = message.userinfo.name;
 
-          const data = {
-            type: "updatePlayers",
-            data: clientsInfo,
-          };
-
-          client.send(JSON.stringify(data));
-        }
-      });
-
+      const data = {
+        type: "updatePlayers",
+        data: clientsInfo,
+      };
+      
+      broadcast(JSON.stringify(data));
     }
+  });
 
-    if (message.type === "leave") {
-      console.log("leave", message);
-      let index = clientsInfo.findIndex((client) => client.name === message.name);
-      clientsInfo.splice(index, 1);
+  ws.on("close", function close() {
 
-      clients.forEach(function (client) {
-        if (client.readyState === WebSocket.OPEN) {
+    console.log("WebSocket disconnected.");
 
-          const data = {
-            type: "updatePlayers",
-            data: clientsInfo,
-          };
+    let index = clientsInfo.findIndex((client) => client.name === ws.name);
+    clientsInfo.splice(index, 1);
 
-          client.send(JSON.stringify(data));
-        }
-      }
-      );
-    }
+    const data = {
+      type: "updatePlayers",
+      data: clientsInfo,
+    };
 
-    //console.log("received: %s", message);
+    broadcast(JSON.stringify(data));
   });
 });
+
+function broadcast(data) {
+  clients.forEach(function (client) {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(data);
+    }
+  });
+}
 
 console.log("WebSocket server running on port 8080");
