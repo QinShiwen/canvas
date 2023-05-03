@@ -1,56 +1,14 @@
 # Intro
 A basic painting demo with the functions below:
-- paint
-- claer canvas
-- download canvas
-- change the size and color of the pen
+- Paint
+- Clear canvas
+- Download canvas
+- Change the size and color of the pen
 - Adjust the size of canvas
 - Share link to others to draw together
+- Enter & Leave room
+- Chat 
 
-# Data Structure Design
-## user data for auth
-```
-{
-    userid:string;
-    username:string;
-    email:string;
-    password:string;
-    roomid:string;
-}
-```
-## data when painting with other users
-```
-{
-    hostid:string;
-    roomid:string;
-    users:[{
-        userid:string;
-        username:string;
-    }]
-    paintingInfo:[   //lines in the canvas
-        [{
-            color:string;
-            size:number;
-            start:{ x:number; y:number }
-            end:{ x:number; y:number }
-        },{...},{..}],
-        [{
-            color:string;
-            size:number;
-            start:{ x:number; y:number }
-            end:{ x:number; y:number }
-        }]
-    ]
-}
-```
-## data in the room
-- players
-```
-[ {
-    name: string;
-    icon: any; 
-} ]
-```
 
 # Project Logic
 ## Router Setting
@@ -73,7 +31,7 @@ A basic painting demo with the functions below:
     - startDraw
     - drawing
     - finishDraw
-- canvas data:
+- canvas data
 ```
 [
     {
@@ -84,12 +42,16 @@ A basic painting demo with the functions below:
     }
 ]
 ```
-### others
-- claer canvas
-- download canvas
-- change the size and color of the pen
+- Claer canvas
+- Download canvas
+- Change the size and color of the pen
 - Adjust the size of canvas
 - Share link to others to draw together
+
+### others
+- Player list
+- Chat
+
 ### When to use Websocket?
 - Enter room & Leave room
     - updatePlayers
@@ -108,7 +70,7 @@ A basic painting demo with the functions below:
 - react-color
 - Antd
 - react-google-login
-- Websocket
+- useWebsocket
 
 ## Backend
 - NodeJS

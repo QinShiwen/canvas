@@ -1,18 +1,43 @@
-import React, { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import styled from "styled-components";
 
-export function ChatBox() {
-  const [messages, setMessages] = useState<string[]>([]);
+interface ChatBoxProps {
+  name: string;
+  messages: Message[];
+  sendMessage: (message: string)=> void;
+}
+
+interface Message {
+  name: string;
+  message: string;
+}
+
+export function ChatBox({ name,messages,sendMessage }: ChatBoxProps) {
+
+  //useref in order to get the value of the textarea
+  const textref = useRef<HTMLTextAreaElement>(null);
+  const [content, setContent] = useState<HTMLTextAreaElement>(textref.current!);
+
+  useEffect(() => {
+    setContent(textref.current!);
+  }, [textref]);
 
   return (
     <Container>
       <div className="title"><h2>Room Chat</h2></div>
       <div className="view">
-
+        {messages.map((message, index) => {
+          return (
+            <div className={name === message.name? "messagebox-my" : "messagebox-other"} key={index}>
+              <div className= {name === message.name? "name-my" :"name-other" }>{message.name}</div>
+              <div className="message">{message.message}</div>
+            </div>
+          );
+        })}
       </div>
       <div className="text">
-        <textarea></textarea>
-        <button>Send</button>
+        <textarea ref = {textref}></textarea>
+        <button onClick={()=>{sendMessage(content.value); content.value = ""}}>Send</button>
       </div>
     </Container>
   );
@@ -57,6 +82,7 @@ const Container = styled.div`
   .view {
     flex: 0.5;
     background-color: white;
+    padding: 5px;
   }
 
   .text {
@@ -70,7 +96,7 @@ const Container = styled.div`
     resize: none;
     height: 50px;
     padding: 5px;
-    font-size: 15px;
+    font-size: 16px;
     background: #f1e9ff;
 
     outline: none;
@@ -89,5 +115,29 @@ const Container = styled.div`
     justify-content: center;
     align-items: center;
     cursor: pointer;
+  }
+
+  .messagebox-my {
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+    padding: 3px;
+  }
+
+  .messagebox-other {
+    display: flex;
+    flex-direction: column;
+    padding: 3px;
+  }
+
+  .name-my{
+    font-size: 12px;
+    color: green;
+    text-align: right;
+  }
+
+  .name-other {
+    font-size: 12px;
+    color: red;
   }
 `;

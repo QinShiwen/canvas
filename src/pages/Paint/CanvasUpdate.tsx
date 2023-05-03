@@ -24,6 +24,7 @@ interface Line {
 }
 
 export function CanvasUpdate({ w, h }: CanvasProps) {
+
   function isJSON(str: string) {
     try {
       JSON.parse(str);
@@ -55,6 +56,12 @@ export function CanvasUpdate({ w, h }: CanvasProps) {
         console.log(data);
         setPlayers(data.data);
       }
+      if (data.type === "updateMessages") {
+        console.log("updateMessages",data);
+        let msg = messages;
+        msg.push(data.data);
+        setMessages(msg);
+      }
     },
 
     onClose: () => {
@@ -71,10 +78,9 @@ export function CanvasUpdate({ w, h }: CanvasProps) {
     shouldReconnect: (closeEvent) => true,
   });
 
-  const username = nanoid(5);
-
+  const [username, setUsername] = useState(nanoid(5));
   const [players, setPlayers] = useState<any[]>([]);
-
+  const [messages, setMessages] = useState<any[]>([]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const [canvas, setCanvas] = useState<HTMLCanvasElement>(canvasRef.current!);
@@ -105,9 +111,6 @@ export function CanvasUpdate({ w, h }: CanvasProps) {
       type: "draw",
       line: line,
     };
-
-    //socket?.emit("message", data);
-    //console.log(socket, data);
   }
 
   function shareLink() {
@@ -155,6 +158,22 @@ export function CanvasUpdate({ w, h }: CanvasProps) {
     link.click();
   };
 
+  const sendMessage = (message: string) => {
+    //console.log(message);
+    
+    const data = {
+      type: "sendMessage",
+      messageInfo: {
+        name: username,
+        message: message,
+      },
+    };
+    console.log(username);
+    console.log("sendMessage 1",data);
+    sendJsonMessage(data);
+    console.log("sendMessage 2",data);
+  }
+
   const functionArray = [clear, download, shareLink];
 
   const functionNames = ["Clear", "Download", "Share"];
@@ -166,7 +185,7 @@ export function CanvasUpdate({ w, h }: CanvasProps) {
   return (
     <Container>
       <UsersBar players={players} />
-      <ChatBox />
+      <ChatBox name = {username} messages={messages} sendMessage = {sendMessage}/>
       <ToolBar>
         {functionArray.map((func, index) => {
           return (
