@@ -20,14 +20,22 @@ server.on("connection", function connection(ws) {
       clientsInfo.push(message.userinfo);
       ws.name = message.userinfo.name;
       const data = setData("updatePlayers", clientsInfo);
-      broadcast(data);
+      broadcast(data,true);
     }
 
     if (message.type === "sendMessage") {
       console.log(message);
       messages.push(message);
       const data = setData("updateMessages", message.messageInfo);
-      broadcast(data);
+      broadcast(data,true);
+    }
+
+    if (message.type === "draw") {
+      //paintData.push(message);
+      //const data = setData("updatePaint", paintData);
+      console.log(message);
+      const data = setData("draw", message.data);
+      broadcast(data,false);
     }
   });
 
@@ -39,15 +47,22 @@ server.on("connection", function connection(ws) {
     const data = setData("updatePlayers", clientsInfo);
     broadcast(data);
   });
+
+  // ifToMe: true: send to all clients, false: send to all clients except me
+  function broadcast(data,ifToMe) {
+    clients.forEach(function (client) {
+      const condition = (ifToMe)?
+      (client.readyState === WebSocket.OPEN):(client !== ws
+        && client.readyState === WebSocket.OPEN);
+
+      if (condition) {
+        client.send(data);
+      }
+    });
+  }
 });
 
-function broadcast(data) {
-  clients.forEach(function (client) {
-    if (client.readyState === WebSocket.OPEN) {
-      client.send(data);
-    }
-  });
-}
+
 
 function setData(type, data) {
   const packagedata = JSON.stringify({

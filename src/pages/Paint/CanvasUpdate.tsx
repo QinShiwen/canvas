@@ -21,6 +21,8 @@ interface Point {
 interface Line {
   start: Point;
   end: Point;
+  color: string;
+  penSize: number;
 }
 
 export function CanvasUpdate({ w, h }: CanvasProps) {
@@ -51,17 +53,26 @@ export function CanvasUpdate({ w, h }: CanvasProps) {
       if (!isJSON(event.data)) {
         return;
       }
+
       const data = JSON.parse(event.data);
       if (data.type === "updatePlayers") {
         console.log(data);
         setPlayers(data.data);
       }
+
       if (data.type === "updateMessages") {
         console.log("updateMessages",data);
         let msg = messages;
         msg.push(data.data);
         setMessages(msg);
       }
+
+      if (data.type === "draw") {
+        console.log(data.data);
+        let line = JSON.parse(data.data);
+        drawLine(line);
+      }
+
     },
 
     onClose: () => {
@@ -92,25 +103,19 @@ export function CanvasUpdate({ w, h }: CanvasProps) {
   const [penSize, setPenSize] = useState(5);
 
   function drawLine(line: Line) {
+    //console.log(line);
     const canvas = canvasRef.current;
-
     if (canvas) {
       const ctx = canvas?.getContext("2d");
       if (ctx) {
+        ctx.strokeStyle = line.color;
+        ctx.lineWidth = line.penSize;
         ctx.beginPath();
         ctx.moveTo(line.start.x, line.start.y);
         ctx.lineTo(line.end.x, line.end.y);
         ctx.stroke();
       }
     }
-  }
-
-  //tell the server to draw the line
-  function sendLine(line: Line) {
-    const data = {
-      type: "draw",
-      line: line,
-    };
   }
 
   function shareLink() {
@@ -132,10 +137,15 @@ export function CanvasUpdate({ w, h }: CanvasProps) {
         x: e.pageX - canvas.offsetLeft,
         y: e.pageY - canvas.offsetTop,
       };
-      const line = { start: lastPos, end: newPos };
-      setLastPos(newPos);
+
+      let line = { start: lastPos, end: newPos, color: color, penSize: penSize };
       drawLine(line);
-      sendLine(line);
+      const data = {
+        type: "draw",
+        data: JSON.stringify(line),
+      }
+      sendJsonMessage(data);
+      setLastPos(newPos);
     }
   }
 
@@ -169,9 +179,9 @@ export function CanvasUpdate({ w, h }: CanvasProps) {
       },
     };
     console.log(username);
-    console.log("sendMessage 1",data);
+    //console.log("sendMessage 1",data);
     sendJsonMessage(data);
-    console.log("sendMessage 2",data);
+    //console.log("sendMessage 2",data);
   }
 
   const functionArray = [clear, download, shareLink];
